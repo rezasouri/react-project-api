@@ -19,6 +19,14 @@ const Home = () => {
         setData(responseJson.data);
       });
   }, []);
+  const onDeleteClick = (id) => {
+    axios.delete(`http://localhost:3001/delete?id=${id}`).then((response) => {
+      if (response.status === 201) {
+        setData(response.data.data);
+      }
+    });
+  };
+
   // setTimeout(() => {
   //   controller.abort();
   // }, 3000);
@@ -37,7 +45,7 @@ const Home = () => {
   //   .catch((e) => {})
   //   .finally(() => {});
   return (
-    <Container maxWidth="lg" style={{ backgroundColor: "gray" }}>
+    <Container maxWidth="lg">
       <Grid container style={{ marginTop: 20 }}>
         {data.map((item) => (
           <Item
@@ -45,6 +53,7 @@ const Home = () => {
             image={item.image}
             title={item.title}
             price={item.price}
+            onDelete={() => onDeleteClick(item.id)}
           />
         ))}
       </Grid>
