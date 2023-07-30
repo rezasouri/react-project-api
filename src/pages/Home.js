@@ -1,4 +1,4 @@
-import { Container, Grid } from "@mui/material";
+import { Button, Container, Grid, TextField, Typography } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Item from "../components/item";
@@ -6,6 +6,11 @@ import Item from "../components/item";
 const Home = () => {
   // const controller = new AbortController();
   const [data, setData] = useState([]);
+  const [title, setTitle] = useState("");
+  const [image, setImage] = useState("");
+  const [price, setPrice] = useState("");
+  const [errors, setErrors] = useState([]);
+  const [disabled, setDisabled] = useState(false);
   useEffect(() => {
     fetch("http://localhost:3001/", {
       method: "GET",
@@ -25,6 +30,34 @@ const Home = () => {
         setData(response.data.data);
       }
     });
+  };
+  let status;
+  const add = () => {
+    setDisabled(true);
+    console.log(image, title, price);
+    fetch("http://localhost:3001/add", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        image: image,
+        title: title,
+        price: price,
+      }),
+    })
+      .then((response) => {
+        status = response.status;
+        return response.json();
+      })
+      .then((responseJson) => {
+        if (status === 201) {
+          setData(responseJson.data);
+        } else if (status === 400) {
+          setErrors(responseJson.errors);
+        }
+        setDisabled(false);
+      });
   };
 
   // setTimeout(() => {
@@ -57,6 +90,43 @@ const Home = () => {
           />
         ))}
       </Grid>
+      <Grid container style={{ margin: 20 }}>
+        <Typography style={{ margin: 20 }}>اضافه کردن عکس جدید</Typography>
+        <TextField
+          value={image}
+          onChange={(e) => setImage(e.target.value)}
+          style={{ margin: 20 }}
+          label="تصویر"
+          variant="outlined"
+        />
+        <TextField
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          style={{ margin: 20 }}
+          label="عنوان"
+          variant="outlined"
+        />
+        <TextField
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+          style={{ margin: 20 }}
+          label="قیمت"
+          variant="outlined"
+        />
+        <Button
+          disabled={disabled}
+          onClick={add}
+          variant="contained"
+          style={{ margin: 20, width: "100px" }}
+        >
+          ارسال
+        </Button>
+      </Grid>
+      {errors.map((e) => (
+        <li key={e.key}>
+          {e.key}:{e.errorText}
+        </li>
+      ))}
     </Container>
   );
 };
