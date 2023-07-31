@@ -1,6 +1,6 @@
 import { Button, Grid, Typography } from "@mui/material";
 
-const Item = ({ image, title, price, onDelete }) => {
+const Item = ({ image, title, price, onDelete, onUpdate }) => {
   return (
     <Grid item lg={4} style={{ padding: 10, justifyContent: "center" }}>
       <div style={{ border: "1px solid #a1a1a1" }}>
@@ -17,6 +17,13 @@ const Item = ({ image, title, price, onDelete }) => {
           onClick={onDelete}
         >
           حذف
+        </Button>
+        <Button
+          style={{ margin: "0 auto", display: "flex" }}
+          variant="contained"
+          onClick={onUpdate}
+        >
+          ویرایش
         </Button>
       </div>
     </Grid>

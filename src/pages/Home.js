@@ -9,7 +9,10 @@ const Home = () => {
   const [title, setTitle] = useState("");
   const [image, setImage] = useState("");
   const [price, setPrice] = useState("");
+  const [id, setId] = useState(0);
+  const [titleu, setTitleu] = useState("");
   const [errors, setErrors] = useState([]);
+  const [errors2, setErrors2] = useState([]);
   const [disabled, setDisabled] = useState(false);
   useEffect(() => {
     fetch("http://localhost:3001/", {
@@ -30,6 +33,23 @@ const Home = () => {
         setData(response.data.data);
       }
     });
+  };
+  const onUpdateClick = () => {
+    axios(`http://localhost:3001/update?id=${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: {
+        title: titleu,
+      },
+    })
+      .then((response) => {
+        setData(response.data.data);
+      })
+      .catch((e) => {
+        setErrors2(e.response.data.errors);
+      });
   };
   let status;
   const add = () => {
@@ -53,6 +73,9 @@ const Home = () => {
       .then((responseJson) => {
         if (status === 201) {
           setData(responseJson.data);
+          setImage("");
+          setTitle("");
+          setPrice("");
         } else if (status === 400) {
           setErrors(responseJson.errors);
         }
@@ -60,25 +83,30 @@ const Home = () => {
       });
   };
 
-  // setTimeout(() => {
-  //   controller.abort();
-  // }, 3000);
-
-  // axios({
-  //   url: "http://localhost:3001",
-  //   method: "GET",
-  //   timeout: 3000,
-  //   timeoutErrorMessage: "error",
-  //   // headers:{},
-  //   // data:{}
-  // })
-  //   .then((response) => {
-  //     console.log(response);
-  //   })
-  //   .catch((e) => {})
-  //   .finally(() => {});
   return (
     <Container maxWidth="lg">
+      <Grid container style={{ margin: 20 }}>
+        <Typography style={{ margin: 20 }}>ویرایش عنوان</Typography>
+        <TextField
+          value={titleu}
+          onChange={(e) => setTitleu(e.target.value)}
+          style={{ margin: 20 }}
+          label="ویرایش"
+          variant="outlined"
+        />
+        <Button
+          onClick={onUpdateClick}
+          variant="contained"
+          style={{ margin: 20, width: "100px" }}
+        >
+          ارسال
+        </Button>
+      </Grid>
+      {errors2.map((e) => (
+        <li key={e.key}>
+          {e.key}:{e.errorText}
+        </li>
+      ))}
       <Grid container style={{ marginTop: 20 }}>
         {data.map((item) => (
           <Item
@@ -87,6 +115,10 @@ const Home = () => {
             title={item.title}
             price={item.price}
             onDelete={() => onDeleteClick(item.id)}
+            onUpdate={() => {
+              setId(item.id);
+              setTitleu(item.title);
+            }}
           />
         ))}
       </Grid>
